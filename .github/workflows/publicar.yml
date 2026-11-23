@@ -1,0 +1,26 @@
+name: Publicar previa
+on:
+  push:
+    paths:
+      - .github/workflows/publicar.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Baixar e conferir jogo
+        run: |
+          curl -fL --retry 3 "https://tmpfiles.org/dl/1795446128.5993f7b7c814a7c2/wMABjk3Pilko/sfc26-web.zip" -o /tmp/jogo.zip
+          echo "bf9ac2c13ab784a723f193c365a90de92d57526dd8b8fd4d3c21077a34abe0ec  /tmp/jogo.zip" | sha256sum -c -
+          unzip -p /tmp/jogo.zip SFC-26-super-mundial-chrome.html > index.html
+          echo "d961975e9b1ab20f90f2a7768ef921a0ce23039f69d97b5073ee3557930a3168  index.html" | sha256sum -c -
+      - name: Publicar
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Adicionar previa web [skip ci]"
+          git push
